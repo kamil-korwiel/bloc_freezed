@@ -37,40 +37,40 @@ class MyHomePage extends StatelessWidget {
       body: Center(
         child: BlocBuilder<WeatherBloc, WeatherState>(
           builder: (context, state) {
-
-            if (state is WeatherInitial){
-              return const Text("Push Button");
-            } else if (state is WeatherLoading){
-              return const SizedBox(child: CircularProgressIndicator(),height: 100.0,width: 100.0,);
-            } else if (state is WeatherLoaded){
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                child: Text("In City ' ${state.weather.cityName} ' is right now ${state.weather.temperatureCelsius.toStringAsFixed(2)} \u2103",
-                overflow: TextOverflow.visible,
-                style: const TextStyle(fontSize: 25.0),
-                textAlign: TextAlign.center,),
+            return state.when(
+              inital: () => const FomatedText(text: 'Push Button',), 
+              loading: () =>  const SizedBox(child: CircularProgressIndicator(),height: 100.0,width: 100.0,),
+              loaded: (weather) => FomatedText(text: "In City ' ${weather.cityName} ' is right now ${weather.temperatureCelsius.toStringAsFixed(2)} \u2103"), 
+              error: (e) => FomatedText(text: e.toString(),)
               );
-            } else if (state is WeatherError){
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                child: Text(state.message,
-                overflow: TextOverflow.visible,
-                style: const TextStyle(fontSize: 24.0),
-                textAlign: TextAlign.center,),
-              );
-            }else {
-              return const Text('null');
-            }
           },
         )
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: (){
-          BlocProvider.of<WeatherBloc>(context).add(const GetWetherEvent(" Tor "));
+          BlocProvider.of<WeatherBloc>(context).add(const WeatherEvent.get("TOR"));
         },
         tooltip: 'New request',
         child: const Icon(Icons.refresh_sharp),
         )
     );
   }
+}
+
+class FomatedText extends StatelessWidget {
+  const FomatedText({
+    Key? key,
+    required this.text,
+  }) : super(key: key);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                child: Text(text,
+                overflow: TextOverflow.visible,
+                style: const TextStyle(fontSize: 24.0),
+                textAlign: TextAlign.center,),
+              );
 }

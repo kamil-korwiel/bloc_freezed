@@ -1,9 +1,9 @@
-
 import 'package:bloc/bloc.dart';
 import 'package:bloc_freezed/weather_model.dart';
 import 'package:bloc_freezed/weather_repository.dart';
-import 'package:equatable/equatable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
+part 'weather_bloc.freezed.dart';
 part 'weather_event.dart';
 part 'weather_state.dart';
 
@@ -12,14 +12,14 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherState> {
   
   WeatherBloc(
     this._weatherRepository,
-  ) : super(WeatherInitial()) {
+  ) : super(const WeatherState.inital()) {
     on<GetWetherEvent>((event, emit) async {
       try{
-        emit(WeatherLoading());
+        emit(const WeatherState.loading());
       final weather = await _weatherRepository.fetchWeather(event.name);
-        emit(WeatherLoaded(weather));
+        emit(WeatherState.loaded(weather));
       }on Exception catch (e) {
-        emit(WeatherError(e.toString()));
+        emit(WeatherState.error(e.toString()));
       }
     });
   }
